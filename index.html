@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>قلب نيون + ألعاب نارية</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;background:#000;overflow:hidden;font-family:Tajawal,system-ui,Segoe UI,Arial}
+
+    /* ترتيب الطبقات: القلب (2) < الألعاب النارية (3) < النص (4) < الزر/الرسالة (5) */
+    #neonCanvas{position:fixed;inset:0;z-index:2;display:block}
+    #fireworksCanvas{position:fixed;inset:0;z-index:3;display:block}
+
+    .center-text{
+      position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
+      z-index:4;color:#fff;text-align:center;
+      font-size:clamp(18px,3.2vw,34px);line-height:1.3;font-weight:700;
+      text-shadow:0 2px 8px rgba(0,0,0,.5);
+      pointer-events:none;white-space:pre-line;max-width:min(90vw, 720px);
+    }
+
+    /* ✅ رسالة التهنئة تحت القلب مباشرة */
+    .greeting{
+      position:fixed;
+      left:50%;
+      /* المسافة تحت القلب — عدّلي النسبة حسب ما تحبين */
+      top:calc(50% + 18vh);
+      transform:translateX(-50%);
+      z-index:5;
+      color:#fff;
+      text-align:center;
+      font-size:clamp(14px,2.6vw,22px);
+      line-height:1.7;
+      max-width:min(92vw, 780px);
+      padding:.75rem 1rem;
+      border-radius:12px;
+      /* خلفية لطيفة وشفافية خفيفة دون حجب الألعاب */
+      background:rgba(0,0,0,.25);
+      border:1px solid rgba(255,255,255,.12);
+      backdrop-filter:blur(2px);
+      box-shadow:0 8px 28px rgba(0,0,0,.28);
+      pointer-events:none; /* ما تمنع الضغط لإطلاق الألعاب */
+    }
+    /* ضبط بسيط للشاشات الأقصر */
+    @media (max-height:700px){
+      .greeting{ top:calc(50% + 14vh); }
+    }
+
+    /* زر "بدء الاحتفال" أسفل المنتصف */
+    .celebrate-btn{
+      position:fixed;left:50%;bottom:28px;transform:translateX(-50%);
+      z-index:5; cursor:pointer;
+      border:0; border-radius:14px; padding:.9rem 1.4rem;
+      font-size:clamp(16px,3.5vw,22px); font-weight:700; letter-spacing:.7px;
+      background:#ffc331; color:#111;
+      box-shadow:0 10px 30px rgba(255,195,49,.35), inset 0 0 18px rgba(255,255,255,.25);
+      transition:transform .1s ease, filter .2s ease, background .2s ease;
+      user-select:none;
+    }
+    .celebrate-btn:hover{ background:#ffe08a; filter:brightness(1.05); }
+    .celebrate-btn:active{ transform:translateX(-50%) scale(0.98); }
+  </style>
+</head>
+<body>
+
+  <!-- 💖 قلب نيون (WebGL Shader) -->
+  <canvas id="neonCanvas"></canvas>
+
+  <!-- 🎆 الألعاب النارية (أعلى من القلب) -->
+  <canvas id="fireworksCanvas"></canvas>
+
+  <!-- 📝 النص وسط القلب -->
+  <div class="center-text">
+    HAPPY BIRTHDAY
+    Hathami
+  </div>
+<br><br>
+  <!-- 🎉 ✅ رسالة التهنئة تحت القلب -->
+  <div class="greeting">
+  ‏توالدت الأنوار .. يوم انولدتي <br>
+‏كل عام وانتي نور هالأرض كل عام
+  </div>
+
+  <!-- 🔘 زر بدء الاحتفال -->
+  <button id="celebrateBtn" class="celebrate-btn" type="button">بدء الاحتفال</button>
+
+  <script>
+    /************** الألعاب النارية **************/
+    const fw = document.getElementById('fireworksCanvas');
+    const fctx = fw.getContext('2d');
+    function resizeFW(){ fw.width=innerWidth; fw.height=innerHeight; }
+    resizeFW(); addEventListener('resize', resizeFW);
+
+    // نمط تركيب لإضاءة أجمل
+    fctx.globalCompositeOperation = 'lighter';
+
+    const fireworks=[], rockets=[];
+    class Rocket{
+      constructor(x,targetY,color){ this.x=x; this.y=fw.height; this.targetY=targetY; this.color=color; this.speed=Math.random()*2+4; }
+      update(){ this.y -= this.speed; return this.y <= this.targetY; }
+      draw(){ fctx.beginPath(); fctx.rect(this.x-3,this.y-10,6,12); fctx.fillStyle=this.color; fctx.fill(); }
+    }
+    class Firework{
+      constructor(x,y){
+        this.p=[];
+        for(let i=0;i<50;i++){
+          const a=(Math.PI*2)*(i/50); const s=Math.random()*4+2;
+          this.p.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,alpha:1});
+        }
+      }
+      update(){ this.p.forEach(pt=>{ pt.x+=pt.vx; pt.y+=pt.vy; pt.vy+=0.05; pt.alpha-=0.01; }); this.p=this.p.filter(pt=>pt.alpha>0); }
+      draw(){
+        this.p.forEach(pt=>{
+          fctx.globalAlpha=pt.alpha;
+          fctx.fillStyle=randomColor();
+          fctx.beginPath();
+          fctx.arc(pt.x,pt.y,3.5,0,Math.PI*2);
+          fctx.fill();
+        });
+        fctx.globalAlpha=1;
+      }
+    }
+    function randomColor(){
+      const c=["#FF5733","#FFC300","#DAF7A6","#C70039","#900C3F","#581845","#ffc331","#ffffff","#00ffae"];
+      return c[(Math.random()*c.length)|0];
+    }
+    function launch(x,y){ rockets.push(new Rocket(x,y,randomColor())); }
+    function explode(x,y){ fireworks.push(new Firework(x,y)); }
+
+    (function animateFW(){
+      fctx.clearRect(0,0,fw.width,fw.height);
+      for(let i=rockets.length-1;i>=0;i--){
+        const r=rockets[i]; r.draw();
+        if(r.update()){ explode(r.x,r.y); rockets.splice(i,1); }
+      }
+      for(let i=fireworks.length-1;i>=0;i--){
+        const f=fireworks[i]; f.update(); f.draw();
+        if(!f.p.length) fireworks.splice(i,1);
+      }
+      requestAnimationFrame(animateFW);
+    })();
+
+    // تشغيل تلقائي عادي
+    function autoStart(){
+      const burst=setInterval(()=>{
+        const x=Math.random()*fw.width*0.8+fw.width*0.1;
+        const y=Math.random()*fw.height*0.4+fw.height*0.1;
+        launch(x,y);
+      },200);
+      setTimeout(()=>clearInterval(burst),2000);
+      setInterval(()=>{
+        const x=Math.random()*fw.width, y=Math.random()*fw.height*0.5;
+        Math.random()<0.5?launch(x,y):explode(x,y);
+      },1500);
+    }
+    window.addEventListener('load', autoStart);
+
+    // 🔥 دفعة ضخمة عند الضغط على "بدء الاحتفال"
+    const celebrateBtn = document.getElementById('celebrateBtn');
+    celebrateBtn.addEventListener('click', megaBurst);
+
+    function megaBurst(){
+      celebrateBtn.style.filter = 'brightness(1.15)';
+      setTimeout(()=>celebrateBtn.style.filter='', 200);
+
+      const duration = 2500;
+      const rocketEvery = 35;
+      const explodeEvery = 60;
+
+      const rocketTimer = setInterval(()=>{
+        const x = Math.random()*fw.width*0.9 + fw.width*0.05;
+        const y = Math.random()*fw.height*0.35 + fw.height*0.1;
+        launch(x,y);
+      }, rocketEvery);
+
+      const boomTimer = setInterval(()=>{
+        const x = Math.random()*fw.width*0.9 + fw.width*0.05;
+        const y = Math.random()*fw.height*0.45 + fw.height*0.1;
+        explode(x,y);
+      }, explodeEvery);
+
+      setTimeout(()=>{
+        clearInterval(rocketTimer);
+        clearInterval(boomTimer);
+        for(let i=0;i<18;i++){
+          const x = Math.random()*fw.width*0.85 + fw.width*0.075;
+          const y = Math.random()*fw.height*0.5  + fw.height*0.08;
+          explode(x,y);
+        }
+      }, duration);
+    }
+
+    /************** قلب نيون (WebGL) — أزرق/وردي **************/
+    const HEART_SCALE = 0.45; // تحكّم سريع بحجم القلب
+
+    const ncanvas = document.getElementById('neonCanvas');
+    const gl = ncanvas.getContext('webgl', { alpha: true }); // شفافية
+    function resizeGL(){
+      ncanvas.width = innerWidth; ncanvas.height = innerHeight;
+      if(!gl) return;
+      gl.viewport(0,0,ncanvas.width,ncanvas.height);
+      if(widthHandle) gl.uniform1f(widthHandle, innerWidth);
+      if(heightHandle) gl.uniform1f(heightHandle, innerHeight);
+      if(scaleHandle) gl.uniform1f(scaleHandle, HEART_SCALE);
+    }
+    let widthHandle=null, heightHandle=null, scaleHandle=null, timeHandle=null;
+    resizeGL(); addEventListener('resize', resizeGL);
+
+    if(gl){ gl.clearColor(0,0,0,0); } // خلفية شفافة
+
+    let time = 0.0;
+    const vertexSource = `
+      attribute vec2 position;
+      void main(){ gl_Position = vec4(position, 0.0, 1.0); }
+    `;
+    const fragmentSource = `
+      precision highp float;
+      uniform float width; uniform float height; uniform float time; uniform float scaleMul;
+      vec2 resolution=vec2(width,height);
+      #define POINT_COUNT 8
+      vec2 points[POINT_COUNT];
+      const float speed=-0.5; const float len=0.25;
+      float intensity=1.3; float radius=0.008;
+
+      float sdBezier(vec2 pos, vec2 A, vec2 B, vec2 C){
+        vec2 a=B-A; vec2 b=A-2.0*B+C; vec2 c=a*2.0; vec2 d=A-pos;
+        float kk=1.0/dot(b,b); float kx=kk*dot(a,b);
+        float ky=kk*(2.0*dot(a,a)+dot(d,b))/3.0; float kz=kk*dot(d,a);
+        float res=0.0; float p=ky-kx*kx; float p3=p*p*p; float q=kx*(2.0*kx*kx-3.0*ky)+kz; float h=q*q+4.0*p3;
+        if(h>=0.0){
+          h=sqrt(h); vec2 x=(vec2(h,-h)-q)/2.0; vec2 uv=sign(x)*pow(abs(x), vec2(1.0/3.0));
+          float t=uv.x+uv.y-kx; t=clamp(t,0.0,1.0); vec2 qos=d+(c+b*t)*t; res=length(qos);
+        } else {
+          float z=sqrt(-p); float v=acos(q/(p*z*2.0))/3.0; float m=cos(v); float n=sin(v)*1.732050808;
+          vec3 t=vec3(m+m,-n-m,n-m)*z-kx; t=clamp(t,0.0,1.0);
+          vec2 qos=d+(c+b*t.x)*t.x; float dis=dot(qos,qos); res=dis;
+          qos=d+(c+b*t.y)*t.y; dis=dot(qos,qos); res=min(res,dis);
+          qos=d+(c+b*t.z)*t.z; dis=dot(qos,qos); res=min(res,dis);
+          res=sqrt(res);
+        }
+        return res;
+      }
+      vec2 getHeartPosition(float t){
+        return vec2(16.0*sin(t)*sin(t)*sin(t),
+                    -(13.0*cos(t)-5.0*cos(2.0*t)-2.0*cos(3.0*t)-cos(4.0*t)));
+      }
+      float getGlow(float dist, float radius, float intensity){ return pow(radius/dist, intensity); }
+      float getSegment(float t, vec2 pos, float offset, float scale){
+        for(int i=0;i<POINT_COUNT;i++){ points[i]=getHeartPosition(offset+float(i)*len+fract(speed*t)*6.28); }
+        vec2 c=(points[0]+points[1])/2.0; vec2 c_prev; float dist=10000.0;
+        for(int i=0;i<POINT_COUNT-1;i++){ c_prev=c; c=(points[i]+points[i+1])/2.0;
+          dist=min(dist, sdBezier(pos, scale*c_prev, scale*points[i], scale*c)); }
+        return max(0.0, dist);
+      }
+      void main(){
+        vec2 uv=gl_FragCoord.xy/resolution.xy;
+        float widthHeightRatio=resolution.x/resolution.y;
+        vec2 centre=vec2(0.5,0.5);
+        vec2 pos=centre-uv; pos.y/=widthHeightRatio; pos.y+=0.02;
+
+        float scale=0.000015*height*scaleMul;
+        float t=time;
+
+        // 💗 وردي
+        float dist=getSegment(t,pos,0.0,scale);
+        float glow=getGlow(dist,radius,intensity);
+        vec3 col=vec3(0.0);
+        col += 10.0*vec3(smoothstep(0.003,0.001,dist));
+        col += glow*vec3(1.0,0.05,0.3);
+
+        // 💙 أزرق
+        dist=getSegment(t,pos,3.4,scale);
+        glow=getGlow(dist,radius,intensity);
+        col += 10.0*vec3(smoothstep(0.003,0.001,dist));
+        col += glow*vec3(0.1,0.4,1.0);
+
+        col = 1.0 - exp(-col);
+        col = pow(col, vec3(0.4545));
+        gl_FragColor = vec4(col, 1.0);
+      }
+    `;
+
+    // WebGL setup
+    const glCtx = gl;
+    if(!glCtx){ console.error('WebGL غير مدعوم.'); }
+    else{
+      const vsh = glCtx.createShader(glCtx.VERTEX_SHADER);
+      glCtx.shaderSource(vsh, vertexSource); glCtx.compileShader(vsh);
+
+      const fsh = glCtx.createShader(glCtx.FRAGMENT_SHADER);
+      glCtx.shaderSource(fsh, fragmentSource); glCtx.compileShader(fsh);
+
+      const program = glCtx.createProgram();
+      glCtx.attachShader(program,vsh); glCtx.attachShader(program,fsh);
+      glCtx.linkProgram(program); glCtx.useProgram(program);
+
+      const vertexData = new Float32Array([-1,1,-1,-1, 1,1, 1,-1]);
+      const vbo = glCtx.createBuffer(); glCtx.bindBuffer(glCtx.ARRAY_BUFFER, vbo);
+      glCtx.bufferData(glCtx.ARRAY_BUFFER, vertexData, glCtx.STATIC_DRAW);
+      const posH = glCtx.getAttribLocation(program,"position");
+      glCtx.enableVertexAttribArray(posH); glCtx.vertexAttribPointer(posH,2,glCtx.FLOAT,false,2*4,0);
+
+      const timeHandle = glCtx.getUniformLocation(program,"time");
+      widthHandle  = glCtx.getUniformLocation(program,"width");
+      heightHandle = glCtx.getUniformLocation(program,"height");
+      scaleHandle  = glCtx.getUniformLocation(program,"scaleMul");
+
+      glCtx.uniform1f(widthHandle, innerWidth);
+      glCtx.uniform1f(heightHandle, innerHeight);
+      glCtx.uniform1f(scaleHandle, HEART_SCALE);
+
+      glCtx.clearColor(0,0,0,0);
+
+      let last = Date.now();
+      function draw(){
+        const now = Date.now(); time += (now-last)/1000.0; last = now;
+        glCtx.clear(glCtx.COLOR_BUFFER_BIT);
+        glCtx.uniform1f(timeHandle, time);
+        glCtx.drawArrays(glCtx.TRIANGLE_STRIP, 0, 4);
+        requestAnimationFrame(draw);
+      }
+      draw();
+    }
+
+    function resizeAll(){ resizeFW(); resizeGL(); }
+    addEventListener('resize', resizeAll);
+  </script>
+</body>
+</html>
