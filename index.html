@@ -21,11 +21,11 @@
     }
 
     /* fallback لـ dvh */
-    @supports not (height: 100dvh) {
-      body { height: 100vh; }
+    @supports not (height: 1000dvh) {
+      body { height: 1000vh; }
     }
-    @supports (height: 100dvh) {
-      body { height: 100dvh; }
+    @supports (height: 1000dvh) {
+      body { height: 1000dvh; }
     }
 
     #neonCanvas,
