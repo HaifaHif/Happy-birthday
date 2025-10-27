@@ -3,132 +3,80 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-  <title>Happy birthday</title>
+  <title> HAPPY BIRTHDAY</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{
+      height:100%;
+      background:#000;
+      font-family:Tajawal, system-ui, Segoe UI, Arial, sans-serif;
+      overflow:hidden; position:relative;
+    }
+    @supports not (height: 100dvh){ body{height:100vh} }
+    @supports (height: 100dvh){ body{height:100dvh} }
+
+    #neonCanvas,#fireworksCanvas{
+      position:fixed; inset:0; width:100%; height:100%;
+      z-index:2; display:block;
+    }
+    #fireworksCanvas{ z-index:3 }
+
+    .name-in-heart{
+      position:fixed; left:50%; top:50%;
+      transform:translate(-50%, -46%); 
+      z-index:5; text-align:center; pointer-events:none;
+      color:#fff; font-weight:800;
+      font-size:clamp(10px, 6vw, 20px);
+      letter-spacing:.5px;
+      text-shadow:
+        0 0 8px rgba(255,255,255,.8),
+        0 0 18px rgba(140,200,255,.55),
+        0 0 32px rgba(80,140,255,.45);
     }
 
-    /* دعم dvh لـ iOS وAndroid */
-    html, body {
-      height: 100%;
-      background: #000;
-      font-family: Tajawal, system-ui, Segoe UI, Arial, sans-serif;
-      overflow: hidden;
-      position: relative;
+    .stack{
+      position:fixed; left:50%; top:68%;
+      transform:translateX(-50%);
+      z-index:5; width:min(92vw, 820px);
+      display:flex; flex-direction:column; align-items:center; gap:14px;
+      padding: 0 16px 16px;
+      pointer-events:none; 
     }
-
-    /* fallback لـ dvh */
-    @supports not (height: 1000dvh) {
-      body { height: 1000vh; }
+    .greeting{
+      color:#fff; text-align:center;
+      font-size:clamp(14px, 2.8vw, 22px); line-height:1.75;
+      width:100%;
+      padding:.95rem 1.25rem;
+      border-radius:14px;
+      background:rgba(0,0,0,.28);
+      border:1px solid rgba(255,255,255,.12);
+      backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);
+      box-shadow:0 8px 28px rgba(0,0,0,.32);
+      pointer-events:none;
     }
-    @supports (height: 1000dvh) {
-      body { height: 1000dvh; }
+    .celebrate-btn{
+      position:static; pointer-events:auto; cursor:pointer;
+      border:0; border-radius:14px;
+      padding:clamp(.7rem,2.8vw,.9rem) clamp(1rem,4vw,1.4rem);
+      font-size:clamp(16px,3.2vw,22px); font-weight:700; letter-spacing:.7px;
+      background:#ffc331; color:#111;
+      box-shadow:0 10px 30px rgba(255,195,49,.35), inset 0 0 18px rgba(255,255,255,.25);
+      transition:transform .1s ease, filter .2s ease, background .2s ease;
+      -webkit-tap-highlight-color:transparent; user-select:none;
+      margin-bottom: env(safe-area-inset-bottom);
     }
+    .celebrate-btn:hover{ background:#ffe08a; filter:brightness(1.05) }
+    .celebrate-btn:active{ transform:scale(.97) }
 
-    #neonCanvas,
-    #fireworksCanvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 2;
-      display: block;
+
+    @media (max-height:650px){
+      .name-in-heart{ transform:translate(-50%,-44%) scale(.95) }
+      .stack{ top:66% }
     }
-
-    #fireworksCanvas {
-      z-index: 3;
-    }
-
-    .center-text {
-      position: fixed;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 4;
-      color: #fff;
-      text-align: center;
-      font-size: clamp(18px, 4.5vw, 36px);
-      line-height: 1.3;
-      font-weight: 700;
-      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
-      pointer-events: none;
-      white-space: pre-line;
-      max-width: min(90vw, 720px);
-      padding: 0 1rem;
-    }
-
-    .greeting {
-      position: fixed;
-      left: 50%;
-      top: 70%;
-      transform: translateX(-50%);
-      z-index: 5;
-      color: #fff;
-      text-align: center;
-      font-size: clamp(14px, 2.8vw, 22px);
-      line-height: 1.6;
-      max-width: min(92vw, 780px);
-      padding: 0.8rem 1.2rem;
-      border-radius: 14px;
-      background: rgba(0,0,0,0.28);
-      border: 1px solid rgba(255,255,255,0.12);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-      box-shadow: 0 8px 28px rgba(0,0,0,0.32);
-      pointer-events: none;
-    }
-
-    /* تحسين التصميم للشاشات القصيرة */
-    @media (max-height: 650px) {
-      .greeting {
-        top: 68%;
-        font-size: clamp(13px, 2.5vw, 20px);
-        padding: 0.6rem 1rem;
-      }
-    }
-
-    @media (max-height: 550px) {
-      .greeting {
-        top: 65%;
-      }
-      .center-text {
-        top: 45%;
-        font-size: clamp(16px, 4vw, 32px);
-      }
-    }
-.celebrate-btn {
-  position: fixed;
-  left: 50%;
-        bottom: clamp(1px, 4vh, 28px);
-
-  transform: translateX(-50%);
-  z-index: 5;
-  cursor: pointer;
-  border: 0;
-  border-radius: 14px;
-  padding: clamp(0.7rem, 2.8vw, 0.9rem) clamp(1rem, 4vw, 1.4rem);
-  font-size: clamp(16px, 3.2vw, 22px);
-  font-weight: 700;
-  letter-spacing: 0.7px;
-  background: #ffc331;
-  color: #111;
-  box-shadow: 0 10px 30px rgba(255,195,49,0.35), inset 0 0 18px rgba(255,255,255,0.25);
-  transition: transform 0.1s ease, filter 0.2s ease, background 0.2s ease;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-    .celebrate-btn:hover {
-      background: #ffe08a;
-      filter: brightness(1.05);
-    }
-
-    .celebrate-btn:active {
-      transform: translateX(-50%) scale(0.97);
+    @media (max-height:540px){
+      .name-in-heart{ transform:translate(-50%,-42%) scale(.9) }
+      .stack{ top:68% }
+      .greeting{ font-size:clamp(13px,2.5vw,20px) }
     }
   </style>
 </head>
@@ -137,204 +85,88 @@
   <canvas id="neonCanvas"></canvas>
   <canvas id="fireworksCanvas"></canvas>
 
-  <div class="center-text">
-    HAPPY BIRTHDAY
-    Hathami
-  </div>
+  <div class="name-in-heart">  HAPPY BIRTHDAY<br>
+    Hathami</div>
 
-  <div class="greeting">
-    الي صديقتي الأحب الى قلبي حذامي 🤍🤍<br>
-    كل عام وانت بخير ويا عسى نكبر ونشيخ سوا وعلاقتنا تصير اقوى واقوى كان ودي احتفل معك واعطيك الهديه بنفسي لكن ماصار🤍🤍🤍🤍<br>
-    من هيف
+  <div class="stack">
+    <div class="greeting">
+      الي صديقتي الأحب الى قلبي حذامي 🤍🤍<br>
+      كل عام وانتِ بخير ويا عسى نكبر ونشيخ سوا وعلاقتنا تصير أقوى وأقوى. كان ودي احتفل معك وأعطيك الهدية بنفسي لكن ما صار 🤍🤍🤍🤍<br>
+      من هيف
+    </div>
+    <button id="celebrateBtn" class="celebrate-btn" type="button">بدء الاحتفال</button>
   </div>
-
-  <button id="celebrateBtn" class="celebrate-btn" type="button">بدء الاحتفال</button>
 
   <script>
-    // ************** الألعاب النارية **************
     const fw = document.getElementById('fireworksCanvas');
     const fctx = fw.getContext('2d');
-
-    function resizeFW() {
-      fw.width = window.innerWidth;
-      fw.height = window.innerHeight;
-    }
-    resizeFW();
-    window.addEventListener('resize', resizeFW);
-
-    fctx.globalCompositeOperation = 'lighter';
-
-    const fireworks = [], rockets = [];
-
-    class Rocket {
-      constructor(x, targetY, color) {
-        this.x = x;
-        this.y = fw.height;
-        this.targetY = targetY;
-        this.color = color;
-        this.speed = Math.random() * 2 + 4;
-      }
-      update() {
-        this.y -= this.speed;
-        return this.y <= this.targetY;
-      }
-      draw() {
-        fctx.beginPath();
-        fctx.rect(this.x - 3, this.y - 10, 6, 12);
-        fctx.fillStyle = this.color;
-        fctx.fill();
-      }
-    }
-
-    class Firework {
-      constructor(x, y) {
-        this.p = [];
-        for (let i = 0; i < 50; i++) {
-          const a = (Math.PI * 2) * (i / 50);
-          const s = Math.random() * 4 + 2;
-          this.p.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, alpha: 1 });
-        }
-      }
-      update() {
-        this.p.forEach(pt => {
-          pt.x += pt.vx;
-          pt.y += pt.vy;
-          pt.vy += 0.05;
-          pt.alpha -= 0.01;
-        });
-        this.p = this.p.filter(pt => pt.alpha > 0);
-      }
-      draw() {
-        this.p.forEach(pt => {
-          fctx.globalAlpha = pt.alpha;
-          fctx.fillStyle = randomColor();
-          fctx.beginPath();
-          fctx.arc(pt.x, pt.y, 3.5, 0, Math.PI * 2);
-          fctx.fill();
-        });
-        fctx.globalAlpha = 1;
-      }
-    }
-
-    function randomColor() {
-      const c = ["#FF5733","#FFC300","#DAF7A6","#C70039","#900C3F","#581845","#ffc331","#ffffff","#00ffae"];
-      return c[(Math.random() * c.length) | 0];
-    }
-
-    function launch(x, y) { rockets.push(new Rocket(x, y, randomColor())); }
-    function explode(x, y) { fireworks.push(new Firework(x, y)); }
-
-    (function animateFW() {
-      fctx.clearRect(0, 0, fw.width, fw.height);
-      for (let i = rockets.length - 1; i >= 0; i--) {
-        const r = rockets[i];
-        r.draw();
-        if (r.update()) {
-          explode(r.x, r.y);
-          rockets.splice(i, 1);
-        }
-      }
-      for (let i = fireworks.length - 1; i >= 0; i--) {
-        const f = fireworks[i];
-        f.update();
-        f.draw();
-        if (!f.p.length) fireworks.splice(i, 1);
-      }
-      requestAnimationFrame(animateFW);
+    function resizeFW(){ fw.width=innerWidth; fw.height=innerHeight }
+    resizeFW(); addEventListener('resize', resizeFW);
+    fctx.globalCompositeOperation='lighter';
+    const fireworks=[], rockets=[];
+    class Rocket{ constructor(x,y,color){ this.x=x; this.y=fw.height; this.targetY=y; this.color=color; this.speed=Math.random()*2+4 }
+      update(){ this.y-=this.speed; return this.y<=this.targetY }
+      draw(){ fctx.beginPath(); fctx.rect(this.x-3,this.y-10,6,12); fctx.fillStyle=this.color; fctx.fill(); } }
+    class Firework{ constructor(x,y){ this.p=[]; for(let i=0;i<50;i++){ const a=(Math.PI*2)*(i/50), s=Math.random()*4+2; this.p.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,alpha:1}) } }
+      update(){ this.p.forEach(pt=>{ pt.x+=pt.vx; pt.y+=pt.vy; pt.vy+=.05; pt.alpha-=.01 }); this.p=this.p.filter(pt=>pt.alpha>0) }
+      draw(){ this.p.forEach(pt=>{ fctx.globalAlpha=pt.alpha; fctx.fillStyle=randomColor(); fctx.beginPath(); fctx.arc(pt.x,pt.y,3.5,0,Math.PI*2); fctx.fill() }); fctx.globalAlpha=1 } }
+    function randomColor(){ const c=["#FF5733","#FFC300","#DAF7A6","#C70039","#900C3F","#581845","#ffc331","#ffffff","#00ffae"]; return c[(Math.random()*c.length)|0] }
+    function launch(x,y){ rockets.push(new Rocket(x,y,randomColor())) }
+    function explode(x,y){ fireworks.push(new Firework(x,y)) }
+    ;(function loop(){
+      fctx.clearRect(0,0,fw.width,fw.height);
+      for(let i=rockets.length-1;i>=0;i--){ const r=rockets[i]; r.draw(); if(r.update()){ explode(r.x,r.y); rockets.splice(i,1) } }
+      for(let i=fireworks.length-1;i>=0;i--){ const f=fireworks[i]; f.update(); f.draw(); if(!f.p.length) fireworks.splice(i,1) }
+      requestAnimationFrame(loop);
     })();
-
-    function autoStart() {
-      const burst = setInterval(() => {
-        const x = Math.random() * fw.width * 0.8 + fw.width * 0.1;
-        const y = Math.random() * fw.height * 0.4 + fw.height * 0.1;
-        launch(x, y);
-      }, 200);
-      setTimeout(() => clearInterval(burst), 2000);
-      setInterval(() => {
-        const x = Math.random() * fw.width;
-        const y = Math.random() * fw.height * 0.5;
-        Math.random() < 0.5 ? launch(x, y) : explode(x, y);
-      }, 1500);
+    function autoStart(){
+      const burst=setInterval(()=>{ const x=Math.random()*fw.width*.8+fw.width*.1; const y=Math.random()*fw.height*.4+fw.height*.1; launch(x,y) },200);
+      setTimeout(()=>clearInterval(burst),2000);
+      setInterval(()=>{ const x=Math.random()*fw.width; const y=Math.random()*fw.height*.5; Math.random()<.5?launch(x,y):explode(x,y) },1500);
     }
+    addEventListener('load', autoStart);
 
-    window.addEventListener('load', autoStart);
-
-    const celebrateBtn = document.getElementById('celebrateBtn');
+    const celebrateBtn=document.getElementById('celebrateBtn');
     celebrateBtn.addEventListener('click', megaBurst);
-
-    function megaBurst() {
-      celebrateBtn.style.filter = 'brightness(1.15)';
-      setTimeout(() => celebrateBtn.style.filter = '', 200);
-
-      const duration = 2500;
-      const rocketEvery = 35;
-      const explodeEvery = 60;
-
-      const rocketTimer = setInterval(() => {
-        const x = Math.random() * fw.width * 0.9 + fw.width * 0.05;
-        const y = Math.random() * fw.height * 0.35 + fw.height * 0.1;
-        launch(x, y);
-      }, rocketEvery);
-
-      const boomTimer = setInterval(() => {
-        const x = Math.random() * fw.width * 0.9 + fw.width * 0.05;
-        const y = Math.random() * fw.height * 0.45 + fw.height * 0.1;
-        explode(x, y);
-      }, explodeEvery);
-
-      setTimeout(() => {
-        clearInterval(rocketTimer);
-        clearInterval(boomTimer);
-        for (let i = 0; i < 18; i++) {
-          const x = Math.random() * fw.width * 0.85 + fw.width * 0.075;
-          const y = Math.random() * fw.height * 0.5 + fw.height * 0.08;
-          explode(x, y);
-        }
-      }, duration);
+    function megaBurst(){
+      celebrateBtn.style.filter='brightness(1.15)';
+      setTimeout(()=>celebrateBtn.style.filter='',200);
+      const duration=2500, rocketEvery=35, explodeEvery=60;
+      const rocketTimer=setInterval(()=>{ const x=Math.random()*fw.width*.9+fw.width*.05; const y=Math.random()*fw.height*.35+fw.height*.1; launch(x,y) },rocketEvery);
+      const boomTimer=setInterval(()=>{ const x=Math.random()*fw.width*.9+fw.width*.05; const y=Math.random()*fw.height*.45+fw.height*.1; explode(x,y) },explodeEvery);
+      setTimeout(()=>{ clearInterval(rocketTimer); clearInterval(boomTimer);
+        for(let i=0;i<18;i++){ const x=Math.random()*fw.width*.85+fw.width*.075; const y=Math.random()*fw.height*.5+fw.height*.08; explode(x,y) }
+      },duration);
     }
 
-    // ************** قلب نيون (WebGL) **************
-    const HEART_SCALE = 0.45;
-    const ncanvas = document.getElementById('neonCanvas');
-    const gl = ncanvas.getContext('webgl', { alpha: true });
-
-    function resizeGL() {
-      ncanvas.width = window.innerWidth;
-      ncanvas.height = window.innerHeight;
-      if (!gl) return;
-      gl.viewport(0, 0, ncanvas.width, ncanvas.height);
-      if (widthHandle) gl.uniform1f(widthHandle, window.innerWidth);
-      if (heightHandle) gl.uniform1f(heightHandle, window.innerHeight);
-      if (scaleHandle) gl.uniform1f(scaleHandle, HEART_SCALE);
+    const HEART_SCALE=0.45;
+    const ncanvas=document.getElementById('neonCanvas');
+    const gl=ncanvas.getContext('webgl',{alpha:true});
+    function resizeGL(){
+      ncanvas.width=innerWidth; ncanvas.height=innerHeight;
+      if(!gl) return; gl.viewport(0,0,ncanvas.width,ncanvas.height);
+      if(widthHandle) gl.uniform1f(widthHandle, innerWidth);
+      if(heightHandle) gl.uniform1f(heightHandle, innerHeight);
+      if(scaleHandle) gl.uniform1f(scaleHandle, HEART_SCALE);
     }
+    let widthHandle=null,heightHandle=null,scaleHandle=null,timeHandle=null;
+    resizeGL(); addEventListener('resize', resizeGL);
+    if(gl) gl.clearColor(0,0,0,0);
 
-    let widthHandle = null, heightHandle = null, scaleHandle = null, timeHandle = null;
-    resizeGL();
-    window.addEventListener('resize', resizeGL);
-
-    if (gl) gl.clearColor(0, 0, 0, 0);
-
-    let time = 0.0;
-    const vertexSource = `
-      attribute vec2 position;
-      void main(){ gl_Position = vec4(position, 0.0, 1.0); }
-    `;
-    const fragmentSource = `
-      precision highp float;
-      uniform float width; uniform float height; uniform float time; uniform float scaleMul;
+    let time=0.0;
+    const vertexSource=`attribute vec2 position; void main(){ gl_Position=vec4(position,0.0,1.0); }`;
+    const fragmentSource=`precision highp float; uniform float width; uniform float height; uniform float time; uniform float scaleMul;
       vec2 resolution=vec2(width,height);
       #define POINT_COUNT 8
       vec2 points[POINT_COUNT];
       const float speed=-0.5; const float len=0.25;
       float intensity=1.3; float radius=0.008;
-
       float sdBezier(vec2 pos, vec2 A, vec2 B, vec2 C){
         vec2 a=B-A; vec2 b=A-2.0*B+C; vec2 c=a*2.0; vec2 d=A-pos;
         float kk=1.0/dot(b,b); float kx=kk*dot(a,b);
         float ky=kk*(2.0*dot(a,a)+dot(d,b))/3.0; float kz=kk*dot(d,a);
         float res=0.0; float p=ky-kx*kx; float p3=p*p*p; float q=kx*(2.0*kx*kx-3.0*ky)+kz; float h=q*q+4.0*p3;
-        if(h>=0.0){
-          h=sqrt(h); vec2 x=(vec2(h,-h)-q)/2.0; vec2 uv=sign(x)*pow(abs(x), vec2(1.0/3.0));
+        if(h>=0.0){ h=sqrt(h); vec2 x=(vec2(h,-h)-q)/2.0; vec2 uv=sign(x)*pow(abs(x),vec2(1.0/3.0));
           float t=uv.x+uv.y-kx; t=clamp(t,0.0,1.0); vec2 qos=d+(c+b*t)*t; res=length(qos);
         } else {
           float z=sqrt(-p); float v=acos(q/(p*z*2.0))/3.0; float m=cos(v); float n=sin(v)*1.732050808;
@@ -343,8 +175,7 @@
           qos=d+(c+b*t.y)*t.y; dis=dot(qos,qos); res=min(res,dis);
           qos=d+(c+b*t.z)*t.z; dis=dot(qos,qos); res=min(res,dis);
           res=sqrt(res);
-        }
-        return res;
+        } return res;
       }
       vec2 getHeartPosition(float t){
         return vec2(16.0*sin(t)*sin(t)*sin(t),
@@ -360,80 +191,44 @@
       }
       void main(){
         vec2 uv=gl_FragCoord.xy/resolution.xy;
-        float widthHeightRatio=resolution.x/resolution.y;
+        float wh=resolution.x/resolution.y;
         vec2 centre=vec2(0.5,0.5);
-        vec2 pos=centre-uv; pos.y/=widthHeightRatio; pos.y+=0.02;
-
+        vec2 pos=centre-uv; pos.y/=wh; pos.y+=0.02;
         float scale=0.000015*height*scaleMul;
         float t=time;
-
         float dist=getSegment(t,pos,0.0,scale);
-        float glow=getGlow(dist,radius,intensity);
+        float glow=getGlow(dist,0.008,1.3);
         vec3 col=vec3(0.0);
         col += 10.0*vec3(smoothstep(0.003,0.001,dist));
         col += glow*vec3(1.0,0.05,0.3);
-
         dist=getSegment(t,pos,3.4,scale);
-        glow=getGlow(dist,radius,intensity);
+        glow=getGlow(dist,0.008,1.3);
         col += 10.0*vec3(smoothstep(0.003,0.001,dist));
         col += glow*vec3(0.1,0.4,1.0);
-
         col = 1.0 - exp(-col);
         col = pow(col, vec3(0.4545));
         gl_FragColor = vec4(col, 1.0);
-      }
-    `;
-
-    if (gl) {
-      const vsh = gl.createShader(gl.VERTEX_SHADER);
-      gl.shaderSource(vsh, vertexSource);
-      gl.compileShader(vsh);
-
-      const fsh = gl.createShader(gl.FRAGMENT_SHADER);
-      gl.shaderSource(fsh, fragmentSource);
-      gl.compileShader(fsh);
-
-      const program = gl.createProgram();
-      gl.attachShader(program, vsh);
-      gl.attachShader(program, fsh);
-      gl.linkProgram(program);
-      gl.useProgram(program);
-
-      const vertexData = new Float32Array([-1,1,-1,-1, 1,1, 1,-1]);
-      const vbo = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-      gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW);
-      const posH = gl.getAttribLocation(program, "position");
-      gl.enableVertexAttribArray(posH);
-      gl.vertexAttribPointer(posH, 2, gl.FLOAT, false, 2*4, 0);
-
-      timeHandle = gl.getUniformLocation(program, "time");
-      widthHandle = gl.getUniformLocation(program, "width");
-      heightHandle = gl.getUniformLocation(program, "height");
-      scaleHandle = gl.getUniformLocation(program, "scaleMul");
-
-      gl.uniform1f(widthHandle, window.innerWidth);
-      gl.uniform1f(heightHandle, window.innerHeight);
-      gl.uniform1f(scaleHandle, HEART_SCALE);
-
-      let last = Date.now();
-      function draw() {
-        const now = Date.now();
-        time += (now - last) / 1000.0;
-        last = now;
-        gl.clear(gl.COLOR_BUFFER_BIT);
-        gl.uniform1f(timeHandle, time);
-        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      }`;
+    if(gl){
+      const vsh=gl.createShader(gl.VERTEX_SHADER); gl.shaderSource(vsh,vertexSource); gl.compileShader(vsh);
+      const fsh=gl.createShader(gl.FRAGMENT_SHADER); gl.shaderSource(fsh,fragmentSource); gl.compileShader(fsh);
+      const program=gl.createProgram(); gl.attachShader(program,vsh); gl.attachShader(program,fsh); gl.linkProgram(program); gl.useProgram(program);
+      const vertexData=new Float32Array([-1,1,-1,-1,1,1,1,-1]);
+      const vbo=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,vbo); gl.bufferData(gl.ARRAY_BUFFER,vertexData,gl.STATIC_DRAW);
+      const posH=gl.getAttribLocation(program,"position"); gl.enableVertexAttribArray(posH); gl.vertexAttribPointer(posH,2,gl.FLOAT,false,8,0);
+      timeHandle=gl.getUniformLocation(program,"time");
+      widthHandle=gl.getUniformLocation(program,"width");
+      heightHandle=gl.getUniformLocation(program,"height");
+      scaleHandle=gl.getUniformLocation(program,"scaleMul");
+      gl.uniform1f(widthHandle, innerWidth); gl.uniform1f(heightHandle, innerHeight); gl.uniform1f(scaleHandle, 0.45);
+      let last=Date.now();
+      (function draw(){
+        const now=Date.now(); time += (now-last)/1000.0; last=now;
+        gl.clear(gl.COLOR_BUFFER_BIT); gl.uniform1f(timeHandle,time); gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
         requestAnimationFrame(draw);
-      }
-      draw();
+      })();
     }
-
-    function resizeAll() {
-      resizeFW();
-      resizeGL();
-    }
-    window.addEventListener('resize', resizeAll);
+    addEventListener('resize', ()=>{ resizeFW(); resizeGL(); });
   </script>
 </body>
 </html>
